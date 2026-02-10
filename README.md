@@ -30,16 +30,6 @@ En este documento encontrarás:
 3.  Explicación del **ciclo de vida de compilación** en VS Code.
 4.  **Evidencias de validación** de cada entorno.
 
-## 🚀 Guía de Uso Rápido
-
-Para implementar cualquiera de estos entornos en un nuevo proyecto:
-
-1.  **Consultar:** Navega al stack deseado usando los enlaces de la tabla superior.
-2.  **Copiar:** Copia el contenido de los bloques de código `Dockerfile` y `devcontainer.json` del informe.
-3.  **Implementar:**
-    * Crea una carpeta `.devcontainer` en la raíz de tu proyecto.
-    * Pega los archivos copiados dentro.
-4.  **Ejecutar:** Abre el proyecto en VS Code y selecciona **"Reopen in Container"**.
 
 ## 🛠️ Estructura del Repositorio
 
