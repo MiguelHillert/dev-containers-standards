@@ -40,7 +40,9 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-> **[INSERTAR PANTALLAZO 1: Terminal ejecutando `docker run hello-world`]**
+> **Verificación de Servicio:**
+>
+> ![Validación Docker Hola Mundo](img/pantallazo1.png)
 > *Evidencia de que el servicio Docker está activo y el usuario tiene permisos correctos.*
 
 ### 2.2 Instalación de Visual Studio Code
@@ -58,7 +60,9 @@ Para que la arquitectura cliente-servidor funcione, es obligatorio instalar la e
 3.  Buscar: `Dev Containers`.
 4.  Instalar la extensión oficial de Microsoft (`ms-vscode-remote.remote-containers`).
 
-> **[INSERTAR PANTALLAZO 2: Captura de la pestaña de extensiones mostrando "Dev Containers" instalada]**
+> **Extensión Instalada:**
+>
+> ![Extensión Dev Containers](img/pantallazo2.png)
 
 ---
 
@@ -82,7 +86,9 @@ mkdir -p ~/practicas-devsecops/frontend-angular/.devcontainer
 tree -a ~/practicas-devsecops
 ```
 
-> **[INSERTAR PANTALLAZO 3: Salida del comando `tree` mostrando las carpetas creadas]**
+> **Estructura de Directorios:**
+>
+> ![Estructura Tree](img/pantallazo3.png)
 
 ---
 
@@ -138,7 +144,7 @@ USER $USERNAME
 **Objetivo:** Pre-instalar herramientas globales (`dotnet-ef`) en la imagen para reducir tiempos de espera.
 
 **Justificación de Usuario (`root`):**
-A diferencia de Python, en este contenedor mantenemos el usuario `root`. Esto se hace deliberadamente para facilitar la instalación de herramientas globales del SDK y la gestión de certificados SSL de desarrollo sin errores de permisos. En un entorno de producción, se cambiaría a un usuario sin privilegios por seguridad.
+A diferencia de Python, en este contenedor mantenemos el usuario `root`. Esto se hace deliberadamente para facilitar la instalación de herramientas globales del SDK y la gestión de certificados SSL de desarrollo sin errores de permisos.
 
 **Archivo:** `backend-net/.devcontainer/Dockerfile`
 ```dockerfile
@@ -206,15 +212,14 @@ Para iniciar cualquiera de los entornos creados, siga este procedimiento estánd
 
 ### Paso 2: Detección y Apertura en Contenedor
 VS Code detectará automáticamente la carpeta `.devcontainer`.
-1.  Aparecerá una notificación en la esquina inferior derecha: *"Folder contains a Dev Container configuration file"*.
+1.  Aparecerá una notificación o se usará la paleta de comandos para reabrir en contenedor.
 2.  Hacer clic en el botón azul **"Reopen in Container"**.
 
-**Método Alternativo (Si no sale la notificación):**
-1.  Pulsar `F1` o `Ctrl+Shift+P` para abrir la Paleta de Comandos.
-2.  Escribir: `Dev Containers: Reopen in Container`.
-3.  Presionar Enter.
-
-> **[INSERTAR PANTALLAZO 4: Ventana de VS Code mostrando el proceso "Starting Dev Container" o logs de construcción]**
+> **Proceso de Apertura:**
+>
+> ![Notificación o Menú Reopen](img/pantallazo4.0.png)
+>
+> ![Construyendo Contenedor](img/pantallazo4.1.png)
 
 ### Paso 3: Validación del Entorno
 Una vez cargado el entorno (indicado por la etiqueta verde en la esquina inferior izquierda), abrir la terminal integrada (`Ctrl + ñ`) y verificar que las herramientas están correctamente instaladas:
@@ -222,22 +227,20 @@ Una vez cargado el entorno (indicado por la etiqueta verde en la esquina inferio
 * **Para Python:**
   Ejecutar: `whoami && python --version`
   *Resultado esperado:* Debe mostrar el usuario **vscode** y la versión **3.12.x**.
+  ![Validación Python](img/pantallazo5.1.png)
 
 * **Para .NET:**
   Ejecutar: `dotnet --list-sdks`
   *Resultado esperado:* Debe mostrar el SDK versión **9.0.x** instalado en `/usr/share/dotnet/sdk`.
+  ![Validación .NET](img/pantallazo5.2.png)
 
 * **Para Angular:**
   Ejecutar: `ng version`
   *Resultado esperado:* Debe mostrar el logotipo de Angular CLI y la versión **19.0.0**.
-
-> **[INSERTAR PANTALLAZO 5: Captura final con la terminal mostrando los comandos de validación exitosos]**
+  ![Validación Angular](img/pantallazo5.3.png)
 
 ---
 
 ## 6. Conclusión
 
 A través de esta práctica hemos logrado configurar un ciclo de vida de desarrollo moderno sobre un hardware limitado. La combinación de Docker nativo en Linux y las configuraciones optimizadas de Dev Containers (volúmenes y usuarios no-root) nos permite cumplir con los requisitos de DevSecOps sin comprometer el rendimiento del equipo local.
-
-**Referencias:**
-*Informe de Investigación sobre Dev Containers y Arquitectura de Sistemas.*
