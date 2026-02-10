@@ -1,113 +1,105 @@
-# Manual Técnico: Despliegue de Entornos DevSecOps con Dev Containers
+# Informe Técnico: Implementación de Entornos DevSecOps con Dev Containers
 
-**Asignatura:** Administración de Sistemas / DevSecOps
-**Sistema Operativo Host:** Ubuntu 22.04 LTS (Nativo)
-**Hardware:** Intel Core i3 | 16GB RAM (Optimización de recursos prioritaria)
-
----
-
-## 1. Introducción
-
-El objetivo de esta práctica es implementar entornos de desarrollo reproducibles, aislados y seguros utilizando **Dev Containers**. Esta tecnología soluciona el problema de "funciona en mi máquina" al desacoplar las herramientas de desarrollo del sistema operativo anfitrión.
-
-### Estrategia de Implementación
-Para garantizar la seguridad y el control total sobre el software, utilizaremos **imágenes propias (Custom Images)** definidas mediante `Dockerfile`. Esto nos permite:
-* Controlar las versiones exactas de las herramientas.
-* Reducir el tamaño de las imágenes (uso de versiones `slim`).
-* Implementar medidas de seguridad (usuarios no-root cuando sea posible).
+**Departamento:** Desarrollo / DevOps
+**Proyecto:** Estandarización de Entornos de Desarrollo
+**Autor:** [Tu Nombre]
+**Fecha:** Febrero 2026
 
 ---
 
-## 2. Preparación del Host (Pre-requisitos)
+## 1. Resumen Ejecutivo
 
-Dado que trabajamos en un equipo con recursos de CPU limitados, utilizaremos **Docker Engine nativo** en Linux para evitar la sobrecarga de máquinas virtuales o Docker Desktop.
+Este documento detalla la investigación e implementación técnica de entornos de desarrollo basados en contenedores (**Dev Containers**) para los stacks tecnológicos de la compañía (.NET, Angular y Python).
 
-### 2.1 Instalación y Reparación del Motor Docker
-Se realiza una instalación limpia para evitar conflictos con virtualizadores previos (VirtualBox).
+El objetivo es establecer una arquitectura de **Infraestructura como Código (IaC)** que garantice:
+1.  **Reproducibilidad:** Eliminación de discrepancias entre entornos locales ("funciona en mi máquina").
+2.  **Seguridad (DevSecOps):** Implementación de principios de mínimo privilegio en el ciclo de desarrollo.
+3.  **Eficiencia:** Optimización del consumo de recursos mediante el uso de Docker nativo en Linux.
+
+---
+
+## 2. Investigación: Uso de Imágenes Personalizadas
+
+### 2.1 Viabilidad
+Se ha confirmado la viabilidad y necesidad de utilizar **Imágenes Propias (Custom Dockerfiles)** en lugar de las imágenes genéricas de la comunidad. Esta decisión se fundamenta en:
+
+* **Control de Versiones:** Permite fijar versiones exactas de runtimes (ej. Node 22, .NET 9) y herramientas críticas.
+* **Seguridad:** Facilita el endurecimiento (hardening) de la imagen base y la gestión de usuarios no privilegiados.
+* **Rendimiento:** Uso de imágenes base `slim` (Debian Bookworm) para reducir la huella de memoria y disco.
+
+### 2.2 Estrategia de Configuración
+La configuración se centraliza en el archivo `devcontainer.json`, el cual orquesta el ciclo de vida del contenedor, la instalación de extensiones de VS Code y la configuración de redes/puertos, delegando la construcción del sistema operativo al `Dockerfile`.
+
+---
+
+## 3. Arquitectura de la Solución
+
+Se ha desplegado la solución sobre un host **Ubuntu 22.04 LTS** utilizando **Docker Engine Nativo**. Esta arquitectura evita la sobrecarga de virtualización de Docker Desktop, permitiendo un rendimiento óptimo en hardware estándar.
+
+### 3.1 Prerrequisitos e Instalación
+Se ha saneado el entorno host eliminando conflictos con módulos de virtualización heredados (VirtualBox) para garantizar la estabilidad del Docker Daemon.
 
 ```bash
-# 1. Eliminar módulos conflictivos y limpiar dependencias rotas
+# 1. Limpieza de conflictos previos
 sudo apt-get remove virtualbox-dkms
 sudo dpkg --configure -a
 
-# 2. Instalar Docker Engine y Docker Compose
+# 2. Instalación del Motor Docker
 sudo apt-get update
 sudo apt-get install docker.io docker-compose -y
 
-# 3. Configuración de permisos de usuario (Vital para VS Code)
-# Esto permite que VS Code hable con Docker sin pedir contraseña de root
+# 3. Configuración de permisos (Rootless interaction)
 sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-> **Verificación de Servicio:**
+> **Verificación del Motor Docker:**
 >
-> ![Validación Docker Hola Mundo](img/pantallazo1.png)
->
-> *Evidencia de que el servicio Docker está activo y el usuario tiene permisos correctos.*
+> ![Estado del Servicio Docker](img/pantallazo1.png)
+> *El motor Docker opera correctamente con permisos de usuario configurados.*
 
-### 2.2 Instalación de Visual Studio Code
-Si el entorno no dispone de VS Code, lo instalaremos mediante paquetería `snap` (estándar en Ubuntu) para asegurar actualizaciones automáticas.
-
-```bash
-sudo snap install code --classic
-```
-
-### 2.3 Instalación de la Extensión "Dev Containers"
-Para que la arquitectura cliente-servidor funcione, es obligatorio instalar la extensión que conecta el IDE con el motor Docker.
-
-1.  Abrir VS Code.
-2.  Ir a la barra lateral izquierda, icono de **Extensiones** (o `Ctrl+Shift+X`).
-3.  Buscar: `Dev Containers`.
-4.  Instalar la extensión oficial de Microsoft (`ms-vscode-remote.remote-containers`).
-
-> **Extensión Instalada:**
+> **Integración con IDE:**
 >
 > ![Extensión Dev Containers](img/pantallazo2.png)
+> *Se utiliza la extensión 'Dev Containers' para habilitar la arquitectura cliente-servidor.*
 
 ---
 
-## 3. Configuración del Espacio de Trabajo
+## 4. Estructura del Proyecto
 
-Para mantener el orden y asegurar que VS Code detecte las configuraciones, crearemos una estructura de carpetas específica. Cada proyecto debe tener su propia carpeta `.devcontainer`.
-
-### 3.1 Creación de Directorios
-Ejecuta los siguientes comandos en tu terminal para generar la estructura completa de una sola vez:
+Se ha definido una estructura de directorios modular, donde cada microservicio o script mantiene su propia configuración de infraestructura aislada.
 
 ```bash
-# Crear carpeta raíz de la práctica
-mkdir -p ~/practicas-devsecops
-
-# Crear subcarpetas para cada tecnología y sus configuraciones ocultas
+# Generación de la estructura de carpetas
 mkdir -p ~/practicas-devsecops/script-python/.devcontainer
 mkdir -p ~/practicas-devsecops/backend-net/.devcontainer
 mkdir -p ~/practicas-devsecops/frontend-angular/.devcontainer
-
-# Verificar la estructura
-tree -a ~/practicas-devsecops
 ```
 
-> **Estructura de Directorios:**
+> **Árbol de Directorios:**
 >
 > ![Estructura Tree](img/pantallazo3.png)
 
 ---
 
-## 4. Implementación de los Entornos (Código)
+## 5. Definición de Entornos (Imágenes Base)
 
-A continuación, definimos la infraestructura como código (IaC) para cada entorno.
+A continuación, se documenta la configuración técnica de las imágenes generadas para cada stack tecnológico.
 
-### 4.1 Entorno Scripting (Python) - Seguridad (DevSecOps)
-**Objetivo:** Evitar ejecutar contenedores como `root`. Configuramos un usuario `vscode` con UID 1000.
+### 5.1 Stack de Scripting (Python)
+**Enfoque:** DevSecOps / Seguridad.
+Se ha configurado un entorno donde el desarrollador opera con un usuario estándar (`vscode`, UID 1000) en lugar de `root`, mitigando riesgos de seguridad y problemas de propiedad de archivos en volúmenes montados.
 
-**Archivo:** `script-python/.devcontainer/Dockerfile`
+**Configuración (`Dockerfile`):**
+
 ```dockerfile
 FROM python:3.12-slim-bookworm
 
+# Optimización para contenedores
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# SEGURIDAD: Creación de usuario no-root
+# IMPLEMENTACIÓN DE SEGURIDAD: Usuario no-root
 ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
@@ -119,130 +111,87 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
+# Herramientas de análisis estático
 RUN pip install --no-cache-dir black pylint pytest
 USER $USERNAME
 ```
 
-**Archivo:** `script-python/.devcontainer/devcontainer.json`
-```json
-{
-  "name": "Python Seguro",
-  "build": { "dockerfile": "Dockerfile" },
-  "remoteUser": "vscode",
-  "customizations": {
-    "vscode": {
-      "settings": {
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.linting.enabled": true
-      },
-      "extensions": ["ms-python.python"]
-    }
-  }
-}
-```
+**Validación:**
+> ![Validación Python](img/pantallazo5.1.png)
+> *El entorno confirma la ejecución bajo el usuario 'vscode' y la versión correcta de Python.*
 
-### 4.2 Entorno Backend (.NET) - Productividad
-**Objetivo:** Pre-instalar herramientas globales (`dotnet-ef`) en la imagen para reducir tiempos de espera.
+### 5.2 Stack Backend (.NET)
+**Enfoque:** Productividad del Desarrollador.
+Para este entorno, se mantiene el usuario `root` para permitir la instalación fluida de herramientas globales del SDK y la gestión de certificados de desarrollo HTTPS, esenciales para la API.
 
-**Justificación de Usuario (`root`):**
-A diferencia de Python, en este contenedor mantenemos el usuario `root`. Esto se hace deliberadamente para facilitar la instalación de herramientas globales del SDK y la gestión de certificados SSL de desarrollo sin errores de permisos.
+**Configuración (`Dockerfile`):**
 
-**Archivo:** `backend-net/.devcontainer/Dockerfile`
 ```dockerfile
 FROM [mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim](https://mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim)
 
-# Instalación de herramientas globales en la capa de sistema
+# Pre-instalación de herramientas globales (Entity Framework)
 RUN apt-get update && apt-get install -y git procps curl \
     && dotnet tool install --global dotnet-ef
 
 ENV PATH="$PATH:/root/.dotnet/tools"
 
-# Certificados HTTPS para desarrollo local
+# Generación de certificados de confianza para desarrollo local
 RUN dotnet dev-certs https --clean && dotnet dev-certs https --trust
 ```
 
-**Archivo:** `backend-net/.devcontainer/devcontainer.json`
-```json
-{
-  "name": "Backend .NET Core",
-  "build": { "dockerfile": "Dockerfile" },
-  "forwardPorts": [5000, 5001],
-  "postCreateCommand": "dotnet --version",
-  "remoteUser": "root"
-}
-```
+**Validación:**
+> ![Validación .NET](img/pantallazo5.2.png)
+> *El SDK .NET 9.0 está operativo y las herramientas globales pre-cargadas.*
 
-### 4.3 Entorno Frontend (Angular) - Rendimiento
-**Objetivo:** Usar volúmenes Docker para `node_modules` para evitar la lentitud de E/S en disco.
+### 5.3 Stack Frontend (Angular)
+**Enfoque:** Rendimiento de E/S.
+Se aborda el cuello de botella crítico en desarrollo web: la carpeta `node_modules`. Se utiliza un **Volumen Nombrado (Named Volume)** de Docker para aislar esta carpeta del sistema de archivos del host, mejorando drásticamente la velocidad de compilación e instalación de paquetes.
 
-**Justificación de Usuario (`node`):**
-Aquí **NO** utilizamos root. Usamos el usuario `node` que viene pre-configurado en la imagen oficial. Al igual que en Python, esto sigue las mejores prácticas de seguridad para aplicaciones web expuestas.
+**Configuración (`devcontainer.json` parcial):**
 
-**Archivo:** `frontend-angular/.devcontainer/Dockerfile`
-```dockerfile
-FROM node:22-bookworm-slim
-# Versión fija de Angular CLI
-RUN npm install -g @angular/cli@19.0.0
-RUN apt-get update && apt-get install -y git
-USER node
-```
-
-**Archivo:** `frontend-angular/.devcontainer/devcontainer.json`
 ```json
 {
   "name": "Angular Frontend",
   "build": { "dockerfile": "Dockerfile" },
   "remoteUser": "node",
-  "forwardPorts": [4200],
   "mounts": [
     "source=node_modules_cache,target=/workspace/node_modules,type=volume"
   ]
 }
 ```
 
----
-
-## 5. Procedimiento de Ejecución y Validación
-
-Para iniciar cualquiera de los entornos creados, siga este procedimiento estándar en Visual Studio Code.
-
-### Paso 1: Abrir la Carpeta del Proyecto
-1.  En VS Code, ir a `Archivo > Abrir Carpeta...` (File > Open Folder).
-2.  Seleccionar la carpeta específica del proyecto, por ejemplo: `~/practicas-devsecops/script-python`.
-    * *Importante:* No abra la carpeta raíz, abra la subcarpeta del proyecto específico.
-
-### Paso 2: Detección y Apertura en Contenedor
-VS Code detectará automáticamente la carpeta `.devcontainer`.
-1.  Aparecerá una notificación o se usará la paleta de comandos para reabrir en contenedor.
-2.  Hacer clic en el botón azul **"Reopen in Container"**.
-
-> **Proceso de Apertura:**
->
-> ![Notificación o Menú Reopen](img/pantallazo4.0.png)
->
-> ![Construyendo Contenedor](img/pantallazo4.1.png)
-
-### Paso 3: Validación del Entorno
-Una vez cargado el entorno (indicado por la etiqueta verde en la esquina inferior izquierda), abrir la terminal integrada (`Ctrl + ñ`) y verificar que las herramientas están correctamente instaladas:
-
-* **Para Python:**
-  Ejecutar: `whoami && python --version`
-  >*Resultado esperado:* Debe mostrar el usuario **vscode** y la versión **3.12.x**.
-  >![Validación Python](img/pantallazo5.1.png)
-
-* **Para .NET:**
-  Ejecutar: `dotnet --list-sdks`
-  >*Resultado esperado:* Debe mostrar el SDK versión **9.0.x** instalado en `/usr/share/dotnet/sdk`.
-  >
-  >![Validación .NET](img/pantallazo5.2.png)
-
-* **Para Angular:**
-  Ejecutar: `ng version`
-  >*Resultado esperado:* Debe mostrar el logotipo de Angular CLI y la versión **19.0.0**.
-  >![Validación Angular](img/pantallazo5.3.png)
+**Validación:**
+> ![Validación Angular](img/pantallazo5.3.png)
+> *Angular CLI v19 ejecutándose sobre Node v22.*
 
 ---
 
-## 6. Conclusión
+## 6. Proceso de Compilación y Despliegue
 
-A través de esta práctica hemos logrado configurar un ciclo de vida de desarrollo moderno sobre un hardware limitado. La combinación de Docker nativo en Linux y las configuraciones optimizadas de Dev Containers (volúmenes y usuarios no-root) nos permite cumplir con los requisitos de DevSecOps sin comprometer el rendimiento del equipo local.
+Dando respuesta al requerimiento técnico sobre **cómo se compilan las imágenes** en esta implementación:
+
+### 6.1 Mecanismo de Compilación Local
+En este entorno de desarrollo, la compilación de las imágenes es **orquestada localmente por VS Code**:
+
+1.  **Trigger:** Al abrir el proyecto, VS Code detecta la carpeta `.devcontainer`.
+2.  **Build Context:** El IDE invoca al CLI de Docker utilizando el directorio actual como contexto.
+3.  **Ejecución:** Se ejecuta `docker build`. Docker lee el `Dockerfile` especificado y ejecuta las instrucciones capa por capa (instalación de dependencias, creación de usuarios, etc.).
+4.  **Caché:** Las capas resultantes se almacenan en el registro local del host para acelerar futuros inicios.
+
+> **Evidencia del Proceso de Build:**
+>
+> ![Detección de Configuración](img/pantallazo4.0.png)
+> *VS Code detecta la configuración y solicita reapertura.*
+>
+> ![Logs de Compilación](img/pantallazo4.1.png)
+> *Traza de ejecución del comando docker build iniciada automáticamente por el IDE.*
+
+---
+
+## 7. Conclusiones
+
+La implementación realizada demuestra que es posible estandarizar entornos complejos (.NET, Angular, Python) utilizando contenedores. Se han cumplido los requisitos de la empresa:
+
+1.  **Uso de imágenes personalizadas** para control granular de versiones.
+2.  **Documentación técnica** de las decisiones de arquitectura (Root vs Non-Root).
+3.  **Optimización de recursos** mediante Docker nativo y gestión eficiente de volúmenes para E/S intensiva.
