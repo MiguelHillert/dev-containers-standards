@@ -22,7 +22,7 @@ A continuación se detallan los perfiles estandarizados. Haz clic en "Ver Códig
 
 Este repositorio centraliza toda la investigación, las decisiones de arquitectura y las guías de implementación en un único documento maestro:
 
-👉 **[LEER INFORME TÉCNICO DE IMPLEMENTACIÓN](./INFORME_TECNICO.md)**
+👉 **[LEER INFORME TÉCNICO DE IMPLEMENTACIÓN](./documentacion.md)**
 
 En este documento encontrarás:
 1.  Justificación del uso de **Imágenes Personalizadas**.
