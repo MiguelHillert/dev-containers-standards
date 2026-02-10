@@ -56,11 +56,13 @@ newgrp docker
 > **Verificación del Motor Docker:**
 >
 > ![Estado del Servicio Docker](img/pantallazo1.png)
+>
 > *El motor Docker opera correctamente con permisos de usuario configurados.*
 
 > **Integración con IDE:**
 >
 > ![Extensión Dev Containers](img/pantallazo2.png)
+>
 > *Se utiliza la extensión 'Dev Containers' para habilitar la arquitectura cliente-servidor.*
 
 ---
