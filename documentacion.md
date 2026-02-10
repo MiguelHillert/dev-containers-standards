@@ -137,7 +137,9 @@ USER $USERNAME
 
 ### 5.2 Stack Backend (.NET)
 **Enfoque:** Productividad del Desarrollador.
-A diferencia de Python, en este contenedor mantenemos el usuario `root`. Esto se hace deliberadamente para facilitar la instalación de herramientas globales del SDK y la gestión de certificados SSL de desarrollo sin errores de permisos. **En un entorno de producción, se cambiaría a un usuario sin privilegios por seguridad.**
+A diferencia de Python, en este contenedor mantenemos el usuario `root`. Esto se hace deliberadamente para facilitar la instalación de herramientas globales del SDK y la gestión de certificados SSL de desarrollo sin errores de permisos. 
+
+> [!NOTE]**En un entorno de producción, se cambiaría a un usuario sin privilegios por seguridad.**
 
 **Archivo:** `backend-net/.devcontainer/Dockerfile`
 ```dockerfile
