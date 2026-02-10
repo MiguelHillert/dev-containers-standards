@@ -15,7 +15,7 @@ A continuación se detallan los perfiles estandarizados. Haz clic en "Ver Códig
 | Stack | Tecnología Base | Enfoque Principal | Configuración |
 | :--- | :--- | :--- | :--- |
 | **Scripting** | Python 3.12 | **Seguridad** (Usuario no-root `vscode`) | [Ver Código](./documentacion.md#51-stack-de-scripting-python) |
-| **Backend** | .NET 9.0 SDK | **Productividad** (Herramientas pre-instaladas) | [Ver Código](./documentacion.md#52-stack-backend) |
+| **Backend** | .NET 9.0 SDK | **Productividad** (Herramientas pre-instaladas) | [Ver Código](./documentacion.md#52-stack-backend-NET) |
 | **Frontend** | Angular 19 / Node 22 | **Rendimiento** (Volúmenes para `node_modules`) | [Ver Código](./documentacion.md#53-stack-frontend-angular) |
 
 ## 📚 Documentación Completa
