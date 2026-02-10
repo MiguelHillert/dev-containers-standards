@@ -2,7 +2,7 @@
 
 **Departamento:** Desarrollo / DevOps
 **Proyecto:** Estandarización de Entornos de Desarrollo
-**Autor:** [Tu Nombre]
+**Autor:** Miguel Hillert Jimenez
 **Fecha:** Febrero 2026
 
 ---
